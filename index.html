@@ -399,10 +399,44 @@ let adminPin = sessionStorage.getItem('anansi_admin_pin') || null;
 function isAdmin(){ return !!adminPin; }
 
 /* ============ API ============ */
-async function api(path, opts){
-  const r = await fetch('/api/'+path, opts);
-  if(!r.ok) throw new Error('request failed');
-  return r.json();
+/* ⬇️ FOR GITHUB PAGES: paste your Google Apps Script Web App URL between the quotes.
+   Leave it EMPTY ('') to use the local Node server (server.js) — current behaviour. */
+const API_URL = '';
+
+async function api(path, opts={}){
+  // ---- Local Node backend (unchanged) ----
+  if(!API_URL){
+    const r = await fetch('/api/'+path, opts);
+    if(!r.ok) throw new Error('request failed');
+    return r.json();
+  }
+  // ---- Google Sheets backend (Apps Script) for static hosting ----
+  const method = (opts.method||'GET').toUpperCase();
+  const [p, qs] = path.split('?');
+  const q = new URLSearchParams(qs||'');
+  const pin = q.get('pin') || '';
+  const seg = p.split('/');                 // e.g. ['orders','123']
+  let payload = {};
+  if(opts.body){ try{ payload = JSON.parse(opts.body); }catch(e){} }
+
+  let action;
+  if(seg[0]==='menu')              action = (method==='GET') ? 'getMenu' : 'setMenu';
+  else if(seg[0]==='verify-pin')   action = 'verifyPin';
+  else if(seg[0]==='orders' && !seg[1]) action = method==='GET' ? 'getOrders'
+                                                 : method==='DELETE' ? 'clearOrders' : 'addOrder';
+  else if(seg[0]==='orders' && seg[1]){ action = (method==='PUT') ? 'updateOrder' : 'deleteOrder'; payload.id = Number(seg[1]); }
+
+  let res;
+  if(method==='GET'){
+    res = await fetch(`${API_URL}?action=${encodeURIComponent(action)}&pin=${encodeURIComponent(pin)}`);
+  } else {
+    // string body => Content-Type text/plain => no CORS preflight (Apps Script needs this)
+    const data = Object.assign({action, pin}, action==='setMenu' ? {menu:payload} : payload);
+    res = await fetch(API_URL, {method:'POST', body: JSON.stringify(data)});
+  }
+  const out = await res.json();
+  if(out && out.error) throw new Error(out.error);
+  return out;
 }
 
 /* ============ DATE ============ */
