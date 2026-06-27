@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anansi Tiffin — Order Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff7ed;
+    --card:#ffffff;
+    --primary:#ea580c;
+    --primary-dark:#c2410c;
+    --primary-soft:#fff1e6;
+    --green:#16a34a;
+    --green-soft:#dcfce7;
+    --ink:#3a2e26;
+    --muted:#8b7d72;
+    --line:#f0e3d8;
+    --shadow:0 10px 30px -12px rgba(120,60,20,.25);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Poppins','Noto Sans Gujarati',sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#ffe8d3,transparent),var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    padding:18px;
+  }
+  .wrap{max-width:680px;margin:0 auto}
+
+  /* Header */
+  header{text-align:center;padding:14px 0 22px}
+  .logo{font-family:'Baloo 2';font-weight:700;font-size:2.1rem;color:var(--primary-dark);letter-spacing:-.5px}
+  .logo span{filter:saturate(1.2)}
+  .tag{color:var(--muted);font-size:.92rem;margin-top:2px}
+  .date{display:inline-block;margin-top:10px;background:var(--primary-soft);color:var(--primary-dark);
+    font-weight:600;font-size:.82rem;padding:6px 14px;border-radius:99px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;background:#fff;padding:6px;border-radius:99px;box-shadow:var(--shadow);margin-bottom:18px}
+  .tab{flex:1;border:none;background:transparent;padding:11px 8px;border-radius:99px;cursor:pointer;
+    font-family:inherit;font-weight:600;font-size:.9rem;color:var(--muted);transition:.2s}
+  .tab.active{background:var(--primary);color:#fff;box-shadow:0 6px 14px -6px var(--primary)}
+
+  /* Card */
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:18px}
+  .card h2{font-family:'Baloo 2';font-size:1.25rem;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .card .sub{color:var(--muted);font-size:.85rem;margin-bottom:18px}
+
+  .field{margin-bottom:18px}
+  label.flabel{display:block;font-weight:600;font-size:.9rem;margin-bottom:7px}
+  label.flabel .guj{color:var(--muted);font-weight:500;font-size:.82rem}
+  .hint{font-size:.78rem;color:var(--muted);margin-top:5px}
+
+  input[type=text],input[type=number]{
+    width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:12px;
+    font-family:inherit;font-size:1rem;background:#fffdfb;transition:.18s;color:var(--ink)}
+  input:focus{outline:none;border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px var(--primary-soft)}
+
+  /* qty stepper */
+  .item-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:13px 15px;border:2px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fffdfb}
+  .item-row .iname{font-weight:600}
+  .item-row .iname small{display:block;color:var(--muted);font-weight:500;font-size:.76rem}
+  .stepper{display:flex;align-items:center;gap:0;background:#fff;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+  .stepper button{width:38px;height:38px;border:none;background:var(--primary-soft);color:var(--primary-dark);
+    font-size:1.3rem;font-weight:700;cursor:pointer;line-height:1;transition:.15s}
+  .stepper button:active{background:var(--primary);color:#fff}
+  .stepper .qty{min-width:42px;text-align:center;font-weight:700;font-size:1.05rem}
+
+  /* yes-no toggle */
+  .toggle{display:flex;gap:8px}
+  .toggle button{flex:1;padding:12px;border:2px solid var(--line);border-radius:12px;background:#fffdfb;
+    font-family:inherit;font-weight:600;cursor:pointer;color:var(--muted);transition:.18s}
+  .toggle button.yes.on{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .toggle button.no.on{background:#fee2e2;border-color:#dc2626;color:#dc2626}
+
+  .btn{width:100%;padding:15px;border:none;border-radius:14px;background:var(--primary);color:#fff;
+    font-family:'Baloo 2';font-weight:600;font-size:1.05rem;cursor:pointer;transition:.18s;box-shadow:0 8px 18px -8px var(--primary)}
+  .btn:hover{background:var(--primary-dark)}
+  .btn.ghost{background:#fff;color:var(--primary-dark);border:2px solid var(--line);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--primary)}
+  .btn-row{display:flex;gap:10px}
+
+  /* preview */
+  .preview{background:linear-gradient(135deg,#fff7ed,#ffedd5);border:2px dashed #f7c79b;border-radius:14px;
+    padding:16px 18px;margin-top:6px;font-family:'Noto Sans Gujarati';font-size:1.05rem;line-height:1.7;
+    font-weight:500;color:var(--primary-dark);min-height:58px}
+  .preview .empty{color:var(--muted);font-family:'Poppins';font-style:italic;font-size:.9rem}
+
+  /* orders list */
+  .order{background:#fffdfb;border:2px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px;
+    display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+  .order .txt{font-family:'Noto Sans Gujarati';font-size:.98rem;line-height:1.6;font-weight:500;flex:1}
+  .order .acts{display:flex;gap:6px;flex-shrink:0}
+  .iconbtn{width:34px;height:34px;border:none;border-radius:9px;cursor:pointer;background:var(--primary-soft);
+    color:var(--primary-dark);font-size:1rem;transition:.15s}
+  .iconbtn:hover{background:var(--primary);color:#fff}
+  .iconbtn.del{background:#fee2e2;color:#dc2626}
+  .iconbtn.del:hover{background:#dc2626;color:#fff}
+  .iconbtn.edit{background:#dbeafe;color:#1d4ed8}
+  .iconbtn.edit:hover{background:#1d4ed8;color:#fff}
+
+  .edit-banner{display:flex;align-items:center;gap:8px;background:#dbeafe;border:2px solid #93c5fd;
+    color:#1d4ed8;padding:11px 14px;border-radius:12px;margin-bottom:18px;font-weight:600;font-size:.9rem}
+  .edit-banner span{flex:1}
+  .edit-banner button{background:#fff;border:1px solid #93c5fd;color:#1d4ed8;padding:5px 12px;border-radius:8px;
+    cursor:pointer;font-family:inherit;font-weight:600;font-size:.82rem}
+  #adminBtn.on{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .count-badge{background:var(--primary);color:#fff;border-radius:99px;font-size:.78rem;padding:2px 10px;font-weight:600}
+  .empty-state{text-align:center;color:var(--muted);padding:30px 10px;font-size:.92rem}
+
+  .menu-pill{display:inline-flex;align-items:center;gap:6px;background:var(--green-soft);color:var(--green);
+    padding:5px 12px;border-radius:99px;font-size:.82rem;font-weight:600;margin:3px}
+  .menu-pill.guess{background:#fef3c7;color:#b45309}
+  .menu-display{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  .nomenu{background:#fef3c7;border:2px solid #fcd34d;color:#92400e;padding:13px 15px;border-radius:12px;
+    font-size:.88rem;font-weight:500}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--ink);color:#fff;padding:12px 22px;border-radius:99px;font-weight:500;font-size:.9rem;
+    box-shadow:var(--shadow);opacity:0;transition:.3s;z-index:99}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  .hidden{display:none}
+  footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 0 20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span>🍱</span> Anansi Tiffin</div>
+    <div class="tag">Daily tiffin order form · રોજનું ટિફિન બુકિંગ</div>
+    <div class="date" id="todayDate"></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-view="order">📝 Order</button>
+    <button class="tab" data-view="menu">🍲 Today's Menu</button>
+    <button class="tab" data-view="orders">📋 Orders <span class="count-badge hidden" id="ordersCount">0</span></button>
+  </div>
+
+  <!-- ============ ORDER VIEW (USER) ============ -->
+  <section id="view-order">
+    <div class="card" id="menuMissingCard" style="display:none">
+      <div class="nomenu">⚠️ Today's menu is not set yet. Ask admin to set it in the <b>Today's Menu</b> tab.</div>
+    </div>
+
+    <div class="card" id="orderCard">
+      <h2 id="orderTitle">📝 Place Your Tiffin Order</h2>
+      <p class="sub">Fill the form below · નીચે ફોર્મ ભરો</p>
+
+      <div class="edit-banner" id="editBanner" style="display:none">
+        ✏️ <span>Editing an existing order</span>
+        <button type="button" onclick="cancelEdit()">Cancel</button>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Name(s) <span class="guj">નામ — (combined tiffin? add both, e.g. Jaydeep, Manish)</span></label>
+        <input type="text" id="names" placeholder="e.g. Jaydeep  or  Jaydeep, Manish">
+        <div class="hint">For a combined/shared tiffin, type all names separated by commas.</div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Rotli / Roti count <span class="guj">રોટલીની સંખ્યા</span></label>
+        <div class="item-row">
+          <div class="iname">🫓 Rotli <small>રોટલી</small></div>
+          <div class="stepper">
+            <button type="button" onclick="step('roti',-1)">−</button>
+            <span class="qty" id="qty-roti">3</span>
+            <button type="button" onclick="step('roti',1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Sabji — choose quantity <span class="guj">શાક — જેટલું જોઈએ તેટલું</span></label>
+        <div id="sabjiList"></div>
+        <div class="hint">Set 0 for a sabji you don't want.</div>
+      </div>
+
+      <div class="field" id="specialField" style="display:none">
+        <label class="flabel" id="specialLabel">Special item <span class="guj">સ્પેશિયલ આઈટમ જોઈએ?</span></label>
+        <div class="toggle" id="specialToggle">
+          <button type="button" class="yes" onclick="setSpecial(true)">✓ Yes · હા</button>
+          <button type="button" class="no on" onclick="setSpecial(false)">✗ No · ના</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Dal-Bhat? <span class="guj">દાળ-ભાત જોઈએ?</span></label>
+        <div class="toggle" id="dalbhatToggle">
+          <button type="button" class="yes on" onclick="setDal(true)">✓ Yes · હા</button>
+          <button type="button" class="no" onclick="setDal(false)">✗ No · ના</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Order preview <span class="guj">તમારો ઓર્ડર</span></label>
+        <div class="preview" id="preview"><span class="empty">Fill the form to see your order…</span></div>
+      </div>
+
+      <button class="btn" id="submitBtn" onclick="submitOrder()">✅ Submit Order · ઓર્ડર સબમિટ કરો</button>
+    </div>
+  </section>
+
+  <!-- ============ MENU VIEW (ADMIN ONLY) ============ -->
+  <section id="view-menu" class="hidden">
+    <div class="card" id="menuLocked" style="display:none">
+      <h2>🔒 Admin only</h2>
+      <p class="sub">Only the admin can set Today's Menu.</p>
+      <div class="nomenu" style="margin-bottom:16px">Enter the admin PIN to set or change today's menu.</div>
+      <button class="btn" onclick="unlockMenu()">🔓 Enter Admin PIN</button>
+    </div>
+
+    <div id="menuEditor" style="display:none">
+    <div class="card">
+      <h2>🍲 Set Today's Menu</h2>
+      <p class="sub">Admin · type sabji names in English or Gujarati</p>
+
+      <p class="hint" style="margin:-10px 0 16px">Type in English (e.g. <b>Ringana-bateta</b>, <b>mag</b>) — it auto-converts to Gujarati below. You can also type directly in Gujarati.</p>
+
+      <div class="field">
+        <label class="flabel">Sabji 1 <span class="guj">પ્રથમ શાક</span></label>
+        <input type="text" id="m-sabji1" oninput="updateMenuPreview()" placeholder="e.g. Ringana-bateta  /  mag">
+      </div>
+      <div class="field">
+        <label class="flabel">Sabji 2 <span class="guj">બીજું શાક</span></label>
+        <input type="text" id="m-sabji2" oninput="updateMenuPreview()" placeholder="e.g. bateta  /  rajma">
+      </div>
+      <div class="field">
+        <label class="flabel">Special item <span class="guj">સ્પેશિયલ આઈટમ (optional)</span></label>
+        <input type="text" id="m-special" oninput="updateMenuPreview()" placeholder="Leave blank if none — e.g. shrikhand">
+      </div>
+
+      <div class="field">
+        <label class="flabel">Gujarati preview <span class="guj">ગુજરાતીમાં આ રીતે દેખાશે</span></label>
+        <div class="preview" id="menuPreview"><span class="empty">Type sabji names above…</span></div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Standard items <span class="guj">હંમેશા ઉપલબ્ધ</span></label>
+        <div class="menu-display">
+          <span class="menu-pill">🫓 રોટલી</span>
+          <span class="menu-pill">🍛 દાળ-ભાત</span>
+        </div>
+      </div>
+
+      <button class="btn" onclick="saveMenu()">💾 Save Today's Menu</button>
+    </div>
+
+    <div class="card" id="currentMenuCard" style="display:none">
+      <h2>✅ Current Menu</h2>
+      <div class="menu-display" id="currentMenuDisplay"></div>
+    </div>
+    </div><!-- /menuEditor -->
+  </section>
+
+  <!-- ============ ORDERS VIEW ============ -->
+  <section id="view-orders" class="hidden">
+    <div class="card">
+      <h2>📋 Today's Orders</h2>
+      <p class="sub">All submitted tiffins · Excel-ready format</p>
+      <div id="ordersList"></div>
+      <div class="btn-row" id="ordersActions" style="display:none;margin-top:8px">
+        <button class="btn ghost" onclick="copyAll()">📋 Copy All</button>
+      </div>
+      <button class="btn ghost" id="adminBtn" onclick="toggleAdmin()" style="margin-top:10px">🔒 Admin mode</button>
+    </div>
+  </section>
+
+  <footer>Anansi Tiffin · Made for daily tiffin booking 🧡<br>Created by Maniyo Bharwad</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ STATE ============ */
+const GUJ_NUM = {1:'એક',2:'બે',3:'ત્રણ',4:'ચાર',5:'પાંચ',6:'છ',7:'સાત',8:'આઠ',9:'નવ',10:'દસ'};
+
+/* ===== English (transliterated) -> Gujarati names =====
+   Admin types names in English; these render in Gujarati on the form & orders.
+   Keys are normalized (lowercase, no spaces/hyphens). Add more anytime. */
+const GUJ_DICT = {
+  /* --- sabjis --- */
+  bateta:'બટાકા', batata:'બટાકા', bataka:'બટાકા', aloo:'બટાકા', alu:'બટાકા', potato:'બટાકા',
+  mag:'મગ', mug:'મગ', moong:'મગ', magnidal:'મગની દાળ',
+  rajma:'રાજમા', rajama:'રાજમા',
+  ringan:'રીંગણ', ringana:'રીંગણ', ringna:'રીંગણ', baingan:'રીંગણ', brinjal:'રીંગણ',
+  ringanabateta:'રીંગણ-બટાકા', ringanbateta:'રીંગણ-બટાકા', ringnabateta:'રીંગણ-બટાકા',
+  bhinda:'ભીંડા', bhindi:'ભીંડા', okra:'ભીંડા',
+  dudhi:'દૂધી', lauki:'દૂધી', dudhichana:'દૂધી-ચણા', dudhimuthia:'દૂધી-મુઠિયા',
+  gilora:'ગીલોડા', giloda:'ગીલોડા', tindora:'ટીંડોળા', tindola:'ટીંડોળા',
+  karela:'કારેલા',
+  guvar:'ગુવાર', gavar:'ગુવાર',
+  valor:'વાલોળ', valol:'વાલોળ', papdi:'પાપડી', surtipapdi:'સુરતી પાપડી',
+  methi:'મેથી', methibateta:'મેથી-બટાકા', palak:'પાલક', spinach:'પાલક',
+  kobi:'કોબી', kobij:'કોબીજ', cabbage:'કોબી', flower:'ફ્લાવર', cauliflower:'ફ્લાવર', flavar:'ફ્લાવર', fulavar:'ફુલાવર',
+  chana:'ચણા', channa:'ચણા', chola:'ચોળા', chole:'છોલે', chanabateta:'ચણા-બટાકા',
+  vatana:'વટાણા', vataana:'વટાણા', peas:'વટાણા', matar:'વટાણા', lilavatana:'લીલા વટાણા',
+  tameta:'ટમેટા', tomato:'ટમેટા', sevtameta:'સેવ-ટમેટા', sev:'સેવ',
+  paneer:'પનીર', panir:'પનીર', palakpaneer:'પાલક-પનીર', matarpaneer:'મટર-પનીર', paneerbhurji:'પનીર ભુરજી',
+  mixveg:'મિક્સ વેજ', mix:'મિક્સ', shaak:'શાક', sabji:'શાક',
+  undhiyu:'ઊંધિયું', undhiya:'ઊંધિયું',
+  kadhi:'કઢી', dahi:'દહીં',
+  sambharo:'સંભારો', sambhar:'સંભાર',
+  turiya:'તુરિયા', turia:'તુરિયા', galka:'ગલકા',
+  fansi:'ફણસી', fasi:'ફણસી', beans:'ફણસી',
+  gobi:'ગોબી', aloogobi:'આલુ-ગોબી', jeeraaloo:'જીરા બટાકા', dumaloo:'દમ આલુ',
+  parval:'પરવળ', parwal:'પરવળ', lasaniyabateta:'લસણિયા બટાકા',
+  bharta:'ભડથું', oro:'ઓળો', olo:'ઓળો',
+  daldhokli:'દાળ-ઢોકળી', khichdi:'ખીચડી',
+  /* --- specials / sweets / extras --- */
+  shrikhand:'શ્રીખંડ', srikhand:'શ્રીખંડ', shrikhad:'શ્રીખંડ',
+  gulabjamun:'ગુલાબ જામુન', gulabjambu:'ગુલાબ જામુન',
+  jalebi:'જલેબી', basundi:'બાસુંદી', rasgulla:'રસગુલ્લા',
+  halvo:'હલવો', halwa:'હલવો', sheero:'શીરો', sheera:'શીરો', shero:'શીરો',
+  mohanthal:'મોહનથાળ', peda:'પેંડા', penda:'પેંડા', barfi:'બરફી', burfi:'બરફી',
+  lapsi:'લાપસી', dudhpak:'દૂધપાક', doodhpak:'દૂધપાક', kheer:'ખીર',
+  ladu:'લાડુ', laddu:'લાડુ', malpua:'માલપુઆ', rabdi:'રબડી', rabri:'રબડી',
+  amras:'આમરસ', aamras:'આમરસ', ras:'રસ', kerinoras:'કેરીનો રસ',
+  puri:'પૂરી', poori:'પૂરી', bhajiya:'ભજીયા', bhaji:'ભાજી',
+  dahivada:'દહીંવડા', khaman:'ખમણ', dhokla:'ઢોકળા', dhokra:'ઢોકળા',
+  handvo:'હાંડવો', muthia:'મુઠિયા', thepla:'થેપલા',
+  pulav:'પુલાવ', pulao:'પુલાવ', biryani:'બિરયાની', papad:'પાપડ',
+  chaas:'છાશ', chhash:'છાશ', chhas:'છાશ', raita:'રાયતું', salad:'સલાડ',
+  athanu:'અથાણું', pickle:'અથાણું', masala:'મસાલા',
+  /* --- standard --- */
+  dal:'દાળ', bhat:'ભાત', dalbhat:'દાળ-ભાત', rotli:'રોટલી', roti:'રોટલી'
+};
+
+/* improved phonetic fallback (conjuncts + anusvara) for words not in the dictionary */
+function phonetic(word){
+  word = word.toLowerCase().replace(/[^a-z]/g,'');
+  if(!word) return '';
+  const C = [['chh','છ'],['ch','ચ'],['shr','શ્ર'],['shh','ષ'],['sh','શ'],['kh','ખ'],['gh','ઘ'],
+    ['jh','ઝ'],['th','થ'],['dh','ધ'],['ph','ફ'],['bh','ભ'],['kk','ક્ક'],['ll','લ્લ'],
+    ['k','ક'],['g','ગ'],['j','જ'],['t','ત'],['d','દ'],['n','ન'],['p','પ'],['f','ફ'],['b','બ'],
+    ['m','મ'],['y','ય'],['r','ર'],['l','લ'],['v','વ'],['w','વ'],['s','સ'],['h','હ'],['c','ક'],
+    ['z','ઝ'],['q','ક'],['x','ક્ષ']];
+  const Vind = {aa:'આ',ai:'ઐ',au:'ઔ',ee:'ઈ',oo:'ઊ',a:'અ',i:'ઇ',u:'ઉ',e:'એ',o:'ઓ'};
+  const Vmat = {aa:'ા',ai:'ૈ',au:'ૌ',ee:'ી',oo:'ૂ',a:'',i:'િ',u:'ુ',e:'ે',o:'ો'};
+  const Vord = ['aa','ai','au','ee','oo','a','i','u','e','o'];
+  const isCons = (s,k)=>C.some(([lat])=>s.startsWith(lat,k));
+  const isVowel = (s,k)=>Vord.some(v=>s.startsWith(v,k));
+  let out='', i=0, prevCN=false;   // prevCN = previous emitted was a consonant with no vowel yet
+  while(i<word.length){
+    // n/m before another consonant -> anusvara (ં)
+    if((word[i]==='n'||word[i]==='m') && i+1<word.length && isCons(word,i+1) && !isVowel(word,i+1)){
+      out+='ં'; i++; prevCN=false; continue;
+    }
+    let m=false;
+    for(const [lat,g] of C){
+      if(word.startsWith(lat,i)){
+        if(prevCN) out+='્';          // join consonant cluster with halant
+        out+=g; i+=lat.length; prevCN=true; m=true; break;
+      }
+    }
+    if(m) continue;
+    for(const v of Vord){
+      if(word.startsWith(v,i)){ out+=prevCN?Vmat[v]:Vind[v]; i+=v.length; prevCN=false; m=true; break; }
+    }
+    if(m) continue;
+    i++;
+  }
+  return out;
+}
+
+/* convert a name; returns {text, exact}. exact=false means a word was auto-spelled (not in dictionary). */
+function convertWord(raw){
+  raw = (raw||'').trim();
+  if(!raw) return {text:'', exact:true};
+  if(/[઀-૿]/.test(raw)) return {text:raw, exact:true};   // already Gujarati script
+  const norm = raw.toLowerCase().replace(/[_]+/g,' ').trim();
+  const wholeKey = norm.replace(/[\s\-]+/g,'');
+  if(GUJ_DICT[wholeKey]) return {text:GUJ_DICT[wholeKey], exact:true};
+  const sep = norm.includes('-') ? '-' : ' ';
+  const parts = norm.split(/\s*-\s*|\s+/).filter(Boolean);
+  let exact = true;
+  const conv = parts.map(p=>{
+    const k = p.replace(/[^a-z]/g,'');
+    if(GUJ_DICT[k]) return GUJ_DICT[k];
+    exact = false; return phonetic(k);
+  });
+  return {text:conv.join(sep), exact};
+}
+function toGujarati(raw){ return convertWord(raw).text; }
+
+let menu = null;               // loaded from server
+let orders = [];               // loaded from server
+let qty = { roti:3 };          // roti + each sabji key
+let wantDal = true;
+let wantSpecial = false;       // special item: yes/no (always qty 1)
+let editingId = null;          // set when editing an existing order
+let adminPin = sessionStorage.getItem('anansi_admin_pin') || null;
+function isAdmin(){ return !!adminPin; }
+
+/* ============ API ============ */
+async function api(path, opts){
+  const r = await fetch('/api/'+path, opts);
+  if(!r.ok) throw new Error('request failed');
+  return r.json();
+}
+
+/* ============ DATE ============ */
+function showDate(){
+  const d = new Date();
+  const opt = {weekday:'long', day:'numeric', month:'long', year:'numeric'};
+  document.getElementById('todayDate').textContent = '📅 ' + d.toLocaleDateString('en-GB', opt);
+}
+
+/* ============ TABS ============ */
+function switchTab(view){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.view===view));
+  ['order','menu','orders'].forEach(v=>{
+    document.getElementById('view-'+v).classList.toggle('hidden', v!==view);
+  });
+  if(view==='orders') renderOrders();
+  if(view==='menu') renderMenuView();
+}
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>switchTab(t.dataset.view);
+});
+
+/* ============ MENU (ADMIN) ============ */
+async function saveMenu(){
+  const s1 = document.getElementById('m-sabji1').value.trim();
+  const s2 = document.getElementById('m-sabji2').value.trim();
+  const sp = document.getElementById('m-special').value.trim();
+  if(!s1 && !s2){ toast('Please enter at least one sabji'); return; }
+  const rawSabjis = [s1,s2].filter(Boolean);
+  menu = {
+    sabjis: rawSabjis.map(toGujarati),   // shown on form & orders (Gujarati)
+    sabjisRaw: rawSabjis,                // what admin typed (English)
+    special: sp ? toGujarati(sp) : null,
+    specialRaw: sp || null
+  };
+  try { await api('menu', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(menu)}); }
+  catch { toast('⚠️ Could not save to server'); return; }
+  // reset per-item quantities so the new menu builds cleanly
+  qty = { roti:3 };
+  toast('✅ Menu saved!');
+  renderMenuDisplay();
+  buildOrderForm();
+}
+/* live Gujarati preview as admin types the menu */
+function updateMenuPreview(){
+  const items = [
+    {icon:'🍲', c:convertWord(document.getElementById('m-sabji1').value)},
+    {icon:'🍲', c:convertWord(document.getElementById('m-sabji2').value)},
+    {icon:'⭐', c:convertWord(document.getElementById('m-special').value)}
+  ].filter(x=>x.c.text);
+  const box = document.getElementById('menuPreview');
+  if(!items.length){ box.innerHTML='<span class="empty">Type sabji names above…</span>'; return; }
+  let anyGuess=false;
+  const pills = items.map(x=>{
+    const warn = !x.c.exact;
+    if(warn) anyGuess=true;
+    return `<span class="menu-pill${warn?' guess':''}">${x.icon} ${esc(x.c.text)}${warn?' ⚠️':''}</span>`;
+  }).join('');
+  const note = anyGuess
+    ? `<div class="hint" style="margin-top:10px;color:#b45309">⚠️ The ⚠️ word isn't in the dictionary — it was auto-spelled and may be wrong. Please check it, or type that item directly in Gujarati.</div>`
+    : '';
+  box.innerHTML = pills + note;
+}
+function renderMenuDisplay(){
+  const card = document.getElementById('currentMenuCard');
+  const box = document.getElementById('currentMenuDisplay');
+  if(!menu){ card.style.display='none'; return; }
+  card.style.display='block';
+  let html='';
+  menu.sabjis.forEach(s=> html+=`<span class="menu-pill">🍲 ${esc(s)}</span>`);
+  html+=`<span class="menu-pill">🫓 રોટલી</span><span class="menu-pill">🍛 દાળ-ભાત</span>`;
+  if(menu.special) html+=`<span class="menu-pill">⭐ ${esc(menu.special)}</span>`;
+  box.innerHTML=html;
+}
+function loadMenuInputs(){
+  if(!menu) return;
+  const raw = menu.sabjisRaw || menu.sabjis || [];
+  document.getElementById('m-sabji1').value = raw[0]||'';
+  document.getElementById('m-sabji2').value = raw[1]||'';
+  document.getElementById('m-special').value = (menu.specialRaw ?? menu.special) || '';
+  updateMenuPreview();
+}
+
+/* ============ ORDER FORM ============ */
+function buildOrderForm(){
+  const missing = document.getElementById('menuMissingCard');
+  const orderCard = document.getElementById('orderCard');
+  if(!menu){ missing.style.display='block'; orderCard.style.display='none'; return; }
+  missing.style.display='none'; orderCard.style.display='block';
+
+  // sabji rows
+  const list = document.getElementById('sabjiList');
+  list.innerHTML='';
+  menu.sabjis.forEach((s,i)=>{
+    const key='sabji'+i;
+    if(!(key in qty)) qty[key]=1;
+    list.appendChild(makeRow(key,'🍲 '+s, s));
+  });
+
+  // special — yes/no only (always quantity 1)
+  const spField = document.getElementById('specialField');
+  if(menu.special){
+    spField.style.display='block';
+    document.getElementById('specialLabel').innerHTML =
+      `⭐ Special — ${esc(menu.special)}? <span class="guj">સ્પેશિયલ આઈટમ જોઈએ?</span>`;
+    setSpecial(wantSpecial);
+  } else { spField.style.display='none'; wantSpecial=false; }
+
+  updatePreview();
+}
+function makeRow(key,label,guj){
+  const row=document.createElement('div');
+  row.className='item-row';
+  row.innerHTML=`<div class="iname">${esc(label)}</div>
+    <div class="stepper">
+      <button type="button" onclick="step('${key}',-1)">−</button>
+      <span class="qty" id="qty-${key}">${qty[key]}</span>
+      <button type="button" onclick="step('${key}',1)">+</button>
+    </div>`;
+  return row;
+}
+function step(key,delta){
+  qty[key]=Math.max(0, Math.min(20,(qty[key]||0)+delta));
+  document.getElementById('qty-'+key).textContent=qty[key];
+  updatePreview();
+}
+function setDal(v){
+  wantDal=v;
+  document.querySelector('#dalbhatToggle .yes').classList.toggle('on',v);
+  document.querySelector('#dalbhatToggle .no').classList.toggle('on',!v);
+  updatePreview();
+}
+function setSpecial(v){
+  wantSpecial=v;
+  document.querySelector('#specialToggle .yes').classList.toggle('on',v);
+  document.querySelector('#specialToggle .no').classList.toggle('on',!v);
+  updatePreview();
+}
+
+/* ============ ORDER STRING BUILDER ============ */
+function gujQty(n){ return GUJ_NUM[n] || String(n); }
+
+function buildOrderString(){
+  if(!menu) return '';
+  const parts=[];
+  if(qty.roti>0) parts.push(`${qty.roti} રોટલી`);
+  menu.sabjis.forEach((s,i)=>{
+    const q=qty['sabji'+i]||0;
+    if(q>0) parts.push(`${gujQty(q)} ${s}`);
+  });
+  if(menu.special && wantSpecial){
+    parts.push(menu.special);             // special item: name only, always 1
+  }
+  if(wantDal) parts.push('દાળ-ભાત સાથે');
+  const names=document.getElementById('names').value.trim();
+  let line=parts.join(', ') + ' – 1 ટિફિન';
+  if(names) line+=` (${names})`;
+  return line;
+}
+function updatePreview(){
+  const p=document.getElementById('preview');
+  const str=buildOrderString();
+  const hasQty = qty.roti>0 || menu?.sabjis.some((s,i)=>qty['sabji'+i]>0) || wantDal || wantSpecial;
+  if(!hasQty){ p.innerHTML='<span class="empty">Fill the form to see your order…</span>'; return; }
+  p.textContent=str;
+}
+
+/* collect the structured order so it can be re-loaded for editing */
+function collectData(){
+  return {
+    names: document.getElementById('names').value.trim(),
+    roti: qty.roti,
+    dal: wantDal,
+    sabjis: menu.sabjis.map((s,i)=>qty['sabji'+i]||0),
+    special: menu.special ? wantSpecial : null
+  };
+}
+
+/* ============ SUBMIT (create or update) ============ */
+async function submitOrder(){
+  if(!menu){ toast('Menu not set yet'); return; }
+  const names=document.getElementById('names').value.trim();
+  if(!names){ toast('Please enter your name'); document.getElementById('names').focus(); return; }
+  const str=buildOrderString();
+  const anyItem = qty.roti>0 || menu.sabjis.some((s,i)=>qty['sabji'+i]>0) || wantDal || wantSpecial;
+  if(!anyItem){ toast('Please select at least one item'); return; }
+
+  const payload = JSON.stringify({ text:str, data:collectData() });
+
+  try {
+    if(editingId){
+      const updated = await api('orders/'+editingId, {method:'PUT', headers:{'Content-Type':'application/json'}, body:payload});
+      const idx = orders.findIndex(o=>o.id===editingId);
+      if(idx>=0) orders[idx]=updated;
+      toast('✅ Order updated!');
+    } else {
+      const order = await api('orders', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload});
+      orders.push(order);
+      toast('✅ Order submitted!');
+    }
+  } catch { toast('⚠️ Could not save — is the server running?'); return; }
+
+  resetForm();
+  refreshCount();
+  switchTab('orders');   // show the result
+}
+
+function resetForm(){
+  editingId=null;
+  setEditMode(false);
+  document.getElementById('names').value='';
+  qty={ roti:3 };
+  menu.sabjis.forEach((s,i)=>qty['sabji'+i]=1);
+  wantDal=true;
+  wantSpecial=false;
+  setDal(true);
+  buildOrderForm();
+}
+
+/* ============ EDIT ============ */
+function startEdit(id){
+  const o=orders.find(x=>x.id===id);
+  if(!o){ toast('Order not found'); return; }
+  if(!o.data){ toast('This order was made on an older version and can’t be edited — please re-submit it.'); return; }
+  editingId=id;
+  document.getElementById('names').value=o.data.names||'';
+  qty={ roti: (o.data.roti ?? 3) };
+  menu.sabjis.forEach((s,i)=>qty['sabji'+i]=(o.data.sabjis && o.data.sabjis[i]!=null)?o.data.sabjis[i]:0);
+  wantDal=o.data.dal!==false;
+  wantSpecial=!!o.data.special;
+  setDal(wantDal);
+  buildOrderForm();
+  setEditMode(true);
+  switchTab('order');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelEdit(){ resetForm(); switchTab('orders'); }
+function setEditMode(on){
+  document.getElementById('editBanner').style.display = on ? 'flex' : 'none';
+  document.getElementById('orderTitle').textContent = on ? '✏️ Edit Your Tiffin Order' : '📝 Place Your Tiffin Order';
+  document.getElementById('submitBtn').textContent = on ? '💾 Update Order · ઓર્ડર અપડેટ કરો' : '✅ Submit Order · ઓર્ડર સબમિટ કરો';
+}
+
+/* ============ ADMIN ============ */
+async function adminLogin(){           // prompt + verify PIN, enable admin. returns true on success
+  const pin=prompt('Enter admin PIN:');
+  if(pin===null) return false;
+  try{
+    const r=await api('verify-pin?pin='+encodeURIComponent(pin));
+    if(!r.ok){ toast('❌ Wrong PIN'); return false; }
+  }catch{ toast('⚠️ Could not verify'); return false; }
+  adminPin=pin; sessionStorage.setItem('anansi_admin_pin', pin);
+  toast('🔓 Admin mode on'); updateAdminBtn();
+  return true;
+}
+async function toggleAdmin(){          // orders-tab button: on <-> off
+  if(isAdmin()){
+    adminPin=null; sessionStorage.removeItem('anansi_admin_pin');
+    toast('Admin mode off'); updateAdminBtn(); renderOrders(); renderMenuView(); return;
+  }
+  if(await adminLogin()){ renderOrders(); renderMenuView(); }
+}
+async function unlockMenu(){           // menu-tab lock button
+  if(await adminLogin()){ renderMenuView(); renderOrders(); }
+}
+function updateAdminBtn(){
+  const b=document.getElementById('adminBtn');
+  b.classList.toggle('on', isAdmin());
+  b.textContent = isAdmin() ? '🔓 Admin mode: ON (tap to exit)' : '🔒 Admin mode';
+}
+/* show menu editor only for admin, otherwise the lock screen */
+function renderMenuView(){
+  const admin = isAdmin();
+  document.getElementById('menuLocked').style.display = admin ? 'none' : 'block';
+  document.getElementById('menuEditor').style.display = admin ? 'block' : 'none';
+  if(admin){ loadMenuInputs(); renderMenuDisplay(); }
+}
+
+/* ============ ORDERS LIST ============ */
+async function renderOrders(){
+  try { orders = await api('orders'); } catch {}
+  refreshCount();
+  const box=document.getElementById('ordersList');
+  const acts=document.getElementById('ordersActions');
+  if(orders.length===0){
+    box.innerHTML='<div class="empty-state">No orders yet 🍽️<br>Submitted orders will appear here.</div>';
+    acts.style.display='none';
+    return;
+  }
+  acts.style.display='flex';
+  box.innerHTML=orders.map((o,idx)=>`
+    <div class="order">
+      <div class="txt">${idx+1}. ${esc(o.text)}</div>
+      <div class="acts">
+        <button class="iconbtn edit" title="Edit" onclick="startEdit(${o.id})">✏️</button>
+        <button class="iconbtn" title="Copy" onclick="copyOne(${o.id})">📋</button>
+        ${isAdmin() ? `<button class="iconbtn del" title="Delete (admin)" onclick="delOne(${o.id})">✕</button>` : ``}
+      </div>
+    </div>`).join('');
+}
+function copyOne(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  navigator.clipboard.writeText(o.text).then(()=>toast('Copied!'));
+}
+async function delOne(id){
+  if(!isAdmin()){ toast('Only admin can delete'); return; }
+  if(!confirm('Delete this order? (admin)')) return;
+  try { await api('orders/'+id+'?pin='+encodeURIComponent(adminPin), {method:'DELETE'}); }
+  catch { toast('⚠️ Delete failed (wrong PIN?)'); return; }
+  orders=orders.filter(x=>x.id!==id);
+  renderOrders();
+}
+function copyAll(){
+  const txt=orders.map(o=>o.text).join('\n');
+  navigator.clipboard.writeText(txt).then(()=>toast(`Copied ${orders.length} orders!`));
+}
+function refreshCount(){
+  const b=document.getElementById('ordersCount');
+  b.textContent=orders.length;
+  b.classList.toggle('hidden', orders.length===0);
+}
+
+/* ============ UTIL ============ */
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+document.getElementById('names').addEventListener('input', updatePreview);
+
+/* ============ INIT ============ */
+async function init(){
+  showDate();
+  try { menu = await api('menu'); } catch { menu = null; }
+  try { orders = await api('orders'); } catch { orders = []; }
+  buildOrderForm();
+  refreshCount();
+  updateAdminBtn();
+  renderMenuView();
+}
+init();
+// auto-refresh the orders list every 10s while viewing it (live updates)
+setInterval(()=>{ if(!document.getElementById('view-orders').classList.contains('hidden')) renderOrders(); }, 10000);
+</script>
+</body>
+</html>

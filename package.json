@@ -1,0 +1,14 @@
+{
+  "name": "anansi-tiffin",
+  "version": "1.0.0",
+  "description": "Daily tiffin order form with Gujarati output",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Maniyo Bharwad",
+  "license": "MIT"
+}
