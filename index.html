@@ -70,6 +70,7 @@
   .stepper button{width:38px;height:38px;border:none;background:var(--primary-soft);color:var(--primary-dark);
     font-size:1.3rem;font-weight:700;cursor:pointer;line-height:1;transition:.15s}
   .stepper button:active{background:var(--primary);color:#fff}
+  .stepper button:disabled{opacity:.3;cursor:not-allowed;background:var(--line);color:var(--muted)}
   .stepper .qty{min-width:42px;text-align:center;font-weight:700;font-size:1.05rem}
 
   /* yes-no toggle */
@@ -177,9 +178,9 @@
       </div>
 
       <div class="field">
-        <label class="flabel">Sabji — choose quantity <span class="guj">શાક — જેટલું જોઈએ તેટલું</span></label>
+        <label class="flabel">Sabji — choose quantity <span class="guj">શાક — વધુમાં વધુ ૨</span></label>
         <div id="sabjiList"></div>
-        <div class="hint">Set 0 for a sabji you don't want.</div>
+        <div class="hint" id="sabjiLimitNote">Pick 2 sabji total — 2 of one, or 1 of each.</div>
       </div>
 
       <div class="field" id="specialField" style="display:none">
@@ -535,6 +536,7 @@ function buildOrderForm(){
     if(!(key in qty)) qty[key]=1;
     list.appendChild(makeRow(key,'🍲 '+s, s));
   });
+  refreshSabjiLimits();
 
   // special — yes/no only (always quantity 1)
   const spField = document.getElementById('specialField');
@@ -554,13 +556,32 @@ function makeRow(key,label,guj){
     <div class="stepper">
       <button type="button" onclick="step('${key}',-1)">−</button>
       <span class="qty" id="qty-${key}">${qty[key]}</span>
-      <button type="button" onclick="step('${key}',1)">+</button>
+      <button type="button" id="plus-${key}" onclick="step('${key}',1)">+</button>
     </div>`;
   return row;
 }
+const SABJI_MAX = 2;   // total sabji quantity allowed per tiffin
+function sabjiTotal(){ return menu ? menu.sabjis.reduce((sum,_,i)=>sum+(qty['sabji'+i]||0),0) : 0; }
+function refreshSabjiLimits(){
+  if(!menu) return;
+  const atMax = sabjiTotal() >= SABJI_MAX;     // can't add more sabji once total hits 2
+  menu.sabjis.forEach((s,i)=>{
+    const btn=document.getElementById('plus-sabji'+i);
+    if(btn) btn.disabled = atMax;
+  });
+  const note=document.getElementById('sabjiLimitNote');
+  if(note) note.textContent = atMax
+    ? '✓ 2 sabji selected (max). Reduce one to change the other.'
+    : 'Pick 2 sabji total — 2 of one, or 1 of each.';
+}
 function step(key,delta){
+  // enforce max 2 sabji in total
+  if(key.indexOf('sabji')===0 && delta>0 && sabjiTotal()>=SABJI_MAX){
+    toast('Only 2 sabji allowed per tiffin'); return;
+  }
   qty[key]=Math.max(0, Math.min(20,(qty[key]||0)+delta));
   document.getElementById('qty-'+key).textContent=qty[key];
+  refreshSabjiLimits();
   updatePreview();
 }
 function setDal(v){
