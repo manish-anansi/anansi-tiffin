@@ -1,26 +1,28 @@
 /*
   Anansi Tiffin — Google Sheets backend (Google Apps Script)
   ----------------------------------------------------------
-  This turns a Google Sheet into the database for the static site on GitHub Pages.
-  Setup steps are in DEPLOY.md. In short:
-    1. Create a Google Sheet.
-    2. Extensions -> Apps Script. Delete the default code, paste THIS file.
+  Turns a Google Sheet into the database for the static site on GitHub Pages.
+  Setup in DEPLOY.md. Short version:
+    1. Google Sheet -> Extensions -> Apps Script.
+    2. Delete sample code, paste THIS file, Save.
     3. Set ADMIN_PIN below if you want.
-    4. Deploy -> New deployment -> Web app
-         Execute as: Me
-         Who has access: Anyone
-    5. Copy the Web app URL and paste it into index.html (const API_URL = '...').
+    4. Deploy -> New deployment -> Web app (Execute as: Me, Who has access: Anyone).
+    5. Copy the Web app URL into index.html (const API_URL = '...').
+
+  Menu + the day's date are stored in Script Properties (reliable text),
+  NOT in a sheet cell (Google auto-converts date cells and breaks the daily check).
+  Orders are stored as rows in the "Orders" tab.
 */
 
 const ADMIN_PIN = '2580';   // <-- change to your secret PIN
 
 /* ---------- helpers ---------- */
-function getSS(){ return SpreadsheetApp.getActiveSpreadsheet(); }
+function props(){ return PropertiesService.getScriptProperties(); }
 
-function sheetOf(name, headers){
-  const ss = getSS();
-  let sh = ss.getSheetByName(name);
-  if(!sh){ sh = ss.insertSheet(name); if(headers) sh.appendRow(headers); }
+function ordersSheet(){
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName('Orders');
+  if(!sh){ sh = ss.insertSheet('Orders'); sh.appendRow(['id','tiffin','data']); }
   return sh;
 }
 
@@ -34,16 +36,8 @@ function jsonOut(obj){
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function getConfig(){
-  const sh = sheetOf('Config');
-  const date = String(sh.getRange('A1').getValue() || '');
-  const menuStr = String(sh.getRange('A2').getValue() || '');
-  return { date, menu: menuStr ? JSON.parse(menuStr) : null };
-}
-function setMenuVal(menu){ sheetOf('Config').getRange('A2').setValue(menu ? JSON.stringify(menu) : ''); }
-function setDateVal(d){ sheetOf('Config').getRange('A1').setValue(d); }
-
-function ordersSheet(){ return sheetOf('Orders', ['id','tiffin','data']); }
+function getMenuVal(){ const m = props().getProperty('menu'); return m ? JSON.parse(m) : null; }
+function setMenuVal(menu){ props().setProperty('menu', menu ? JSON.stringify(menu) : ''); }
 
 function getOrders(){
   const sh = ordersSheet();
@@ -62,10 +56,9 @@ function clearOrders(){
 
 /* New day? wipe yesterday's menu + orders automatically. */
 function ensureToday(){
-  const cfg = getConfig();
   const t = today();
-  if(cfg.date !== t){
-    setDateVal(t);
+  if(props().getProperty('date') !== t){
+    props().setProperty('date', t);
     setMenuVal(null);
     clearOrders();
   }
@@ -75,7 +68,7 @@ function ensureToday(){
 function doGet(e){
   ensureToday();
   const action = e.parameter.action;
-  if(action === 'getMenu')   return jsonOut(getConfig().menu);
+  if(action === 'getMenu')   return jsonOut(getMenuVal());
   if(action === 'getOrders') return jsonOut(getOrders());
   if(action === 'verifyPin') return jsonOut({ ok: e.parameter.pin === ADMIN_PIN });
   return jsonOut({ error: 'unknown action' });

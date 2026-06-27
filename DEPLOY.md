@@ -69,8 +69,9 @@ Share that link with the office. It works on any WiFi or phone. 🎉
 ---
 
 ## How it behaves
-- Admin sets the menu (PIN protected) → saved to the Sheet's **Config** tab.
+- Admin sets the menu (PIN protected) → saved in the script's storage.
 - Orders are added to the **Orders** tab (column `tiffin` = the Gujarati line, Excel-ready).
 - Edit updates the same row; delete is admin-only (PIN checked in the script).
-- A new day auto-clears the previous menu + orders (based on the Sheet's timezone:
-  set it via **File → Settings → Time zone** in the Sheet).
+- A new day auto-clears the previous menu + orders (based on the script's timezone:
+  set it in Apps Script via **Project Settings → Time zone**, or the Sheet's
+  **File → Settings → Time zone**).
